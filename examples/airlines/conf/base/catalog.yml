@@ -1,4 +1,24 @@
-# Here you can define all your datasets by using simple YAML syntax.
-#
-# Documentation for this file format can be found in "The Data Catalog"
-# Link: https://docs.kedro.org/en/stable/data/data_catalog.html
+flights:
+  type: ibis.FileDataset
+  filepath: data/01_raw/flights.parquet
+  metadata:
+    kedro-semantic-layer:
+      description: "Flight data with departure and arrival information"
+
+      dimensions:
+        # Classic format
+        origin: _.origin
+
+        # New format
+        destination:
+          expr: _.destination
+          description: "Destination airport code where the flight arrived at"
+
+      measures:
+        # Classic format
+        flight_count: _.count()
+
+        # New format
+        avg_distance:
+          expr: _.distance.mean()
+          description: "Average distance of flights in miles"
