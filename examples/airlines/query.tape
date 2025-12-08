@@ -1,9 +1,9 @@
-Output examples/airlines/query.gif
+Output examples/airlines/query.webm
 
 Set TypingSpeed 75ms
-Set FontSize 11
-Set Width 800
-Set Height 450
+Set FontSize 22
+Set Width 1600
+Set Height 900
 
 Require kedro
 
