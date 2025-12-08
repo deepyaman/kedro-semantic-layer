@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "boring-semantic-layer",
+    "boring-semantic-layer>=0.2.0",
     "kedro>=0.19.7",
 ]
 
@@ -26,7 +26,6 @@ members = [
 
 [tool.uv.sources]
 airlines = { workspace = true }
-boring-semantic-layer = { git = "https://github.com/boringdata/boring-semantic-layer.git", branch = "feat/bsl-v2-new-features" }
 
 [dependency-groups]
 dev = [

@@ -2,9 +2,6 @@
 FROM ghcr.io/charmbracelet/vhs
 COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /bin/
 
-# Install git
-RUN apt-get install -y git
-
 # Change the working directory to the `app` directory
 WORKDIR /app
 

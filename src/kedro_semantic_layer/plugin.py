@@ -5,16 +5,8 @@ from types import MethodType
 from typing import TYPE_CHECKING
 
 import ibis
-from boring_semantic_layer.semantic_api import (
-    SemanticTableExpr,
-    to_semantic_table,
-    with_dimensions,
-    with_measures,
-)
-from boring_semantic_layer.semantic_api.yaml_loader import (
-    _parse_dimensions,
-    _parse_measures,
-)
+from boring_semantic_layer import SemanticModel, to_semantic_table
+from boring_semantic_layer.yaml import _parse_dimensions, _parse_measures
 from kedro.framework.hooks import hook_impl
 from kedro.io import AbstractDataset, DataCatalog
 from kedro.utils import _format_rich, _has_rich_handler
@@ -31,9 +23,9 @@ def _get_load_func(cls: AbstractDataset) -> Callable:
     )
 
 
-def _build_semantic_table(
+def _build_semantic_model(
     table: ibis.Table, dataset_name: str, config: dict[str, str]
-) -> SemanticTableExpr:
+) -> SemanticModel:
     semantic_table = to_semantic_table(table, name=dataset_name)
 
     if dimensions := config.get("dimensions"):
@@ -54,16 +46,16 @@ def _load_wrapper(
     def load(self):
         data = load_func(self)
         _logger.info(
-            "Building semantic table for %s (%s)...",
+            "Building semantic model for %s (%s)...",
             _format_rich(dataset_name, "dark_orange")
             if _has_rich_handler()
             else dataset_name,
             type(self).__name__,
             extra={"markup": True},
         )
-        return _build_semantic_table(data, dataset_name, config)
+        return _build_semantic_model(data, dataset_name, config)
 
-    load.__annotations__["return"] = SemanticTableExpr
+    load.__annotations__["return"] = SemanticModel
     return load
 
 
