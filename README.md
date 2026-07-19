@@ -109,6 +109,8 @@ On `after_catalog_created`, the plugin wraps the `load()` method of every datase
 
 Because the wrapped `load()` closes over the catalog, and Ibis backend connections are not picklable, use the sequential or thread runner (not `ParallelRunner`) for pipelines that load semantic models—the same constraint that already applies to Ibis-backed datasets in general.
 
+`DataCatalog.load()` has no caching, so a dataset joined by several others is rebuilt from scratch on every load that references it—including the underlying Ibis table, not just the semantic model. For a frequently-joined dataset (e.g. a shared dimension table), wrap it in `kedro.io.CachedDataset` to load it once per session. Declare `metadata` on the `CachedDataset` entry itself, not on the `dataset:` it wraps—the hook won't see metadata nested one level down.
+
 ## Compatibility notes
 
 The plugin only uses public Boring Semantic Layer APIs (`from_config`,
