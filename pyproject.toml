@@ -60,5 +60,6 @@ lint = [
 ]
 test = [
     "ibis-framework[duckdb]>=11.0.0",
+    "kedro-datasets>=9.0",
     "pytest>=8.0",
 ]
