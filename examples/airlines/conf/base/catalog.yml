@@ -3,22 +3,55 @@ flights:
   filepath: data/01_raw/flights.parquet
   metadata:
     kedro-semantic-layer:
-      description: "Flight data with departure and arrival information"
-
+      filter: _.dep_time.year() > 2002 # Optional: filter applied to all queries
       dimensions:
-        # Classic format
-        origin: _.origin
-
-        # New format
+        origin:
+          expr: _.origin
+          description: "Flight origin airport code"
         destination:
           expr: _.destination
-          description: "Destination airport code where the flight arrived at"
+          description: "Flight destination airport code"
+        year:
+          expr: _.dep_time.year()
+          description: "Flight year"
+        carrier:
+          expr: _.carrier
+          description: "Carrier code"
 
       measures:
-        # Classic format
-        flight_count: _.count()
-
-        # New format
+        flight_count:
+          expr: _.count()
+          description: "Total number of flights"
+        total_distance:
+          expr: _.distance.sum()
+          description: "Total distance traveled"
         avg_distance:
           expr: _.distance.mean()
-          description: "Average distance of flights in miles"
+          description: "Average flight distance"
+
+      joins:
+        # `model` names another catalog dataset; its semantic model is built
+        # on demand, so `carriers.name` below is queryable from `flights`.
+        carriers:
+          model: carriers
+          type: one
+          left_on: carrier
+          right_on: code
+
+carriers:
+  type: ibis.FileDataset
+  filepath: data/01_raw/carriers.parquet
+  metadata:
+    kedro-semantic-layer:
+      dimensions:
+        code:
+          expr: _.code
+          description: "Carrier code"
+        name:
+          expr: _.name
+          description: "Carrier name"
+
+      measures:
+        carrier_count:
+          expr: _.count()
+          description: "Number of carriers"
