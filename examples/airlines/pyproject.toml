@@ -3,11 +3,11 @@ requires = [ "setuptools",]
 build-backend = "setuptools.build_meta"
 
 [project]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 name = "airlines"
 readme = "README.md"
 dynamic = [ "version",]
-dependencies = [ "ipython>=8.10", "jupyterlab>=3.0", "notebook", "kedro~=1.0.0", "kedro-datasets[ibis-duckdb]>=6.0.0",]
+dependencies = [ "ipython>=8.10", "jupyterlab>=3.0", "notebook", "kedro~=1.0", "kedro-datasets[ibis-duckdb]>=6.0.0",]
 
 [project.scripts]
 airlines = "airlines.__main__:main"
