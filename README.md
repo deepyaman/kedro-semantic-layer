@@ -115,17 +115,16 @@ Because the wrapped `load()` closes over the catalog, and Ibis backend connectio
 
 The plugin only uses public Boring Semantic Layer APIs (`from_config`,
 `to_semantic_table`, `SemanticModel`, `SemanticTable`). On the Kedro side, it
-wraps `load()` through `AbstractDataset._load_wrapper` — the same mechanism
-Kedro itself uses to wrap dataset loading (e.g. for versioning). CI runs
-against the current Kedro release on Python 3.10–3.14; the test suite is what
-catches a Kedro release changing that mechanism.
+wraps `load()` through `AbstractDataset._load_wrapper`—the same mechanism
+Kedro itself uses to wrap dataset loading (e.g. for versioning). CI runs the
+test suite against the current Kedro release on Python 3.10–3.14, so a Kedro
+release that changes this mechanism fails the tests.
 
 It also imports `kedro.utils._format_rich` and `_has_rich_handler`, private
-helpers used only for optional rich-aware log formatting; the import is
-guarded, falling back to plain logging if they're unavailable. This isn't
-hypothetical—`_format_rich` existed in Kedro 0.19.8–0.19.11, was removed in
-0.19.12–0.19.13, and returned in 0.19.14, all within the `kedro>=0.19.7`
-range this plugin declares.
+helpers used only for optional rich-aware log formatting. The import is
+guarded, falling back to plain logging: `_format_rich` existed in Kedro
+0.19.8–0.19.11, disappeared in 0.19.12–0.19.13, and came back in 0.19.14,
+all within the `kedro>=0.19.7` range this plugin declares.
 
 ## Example
 
