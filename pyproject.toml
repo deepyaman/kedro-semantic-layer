@@ -45,6 +45,10 @@ members = [
 [tool.uv.sources]
 airlines = { workspace = true }
 
+[tool.ruff]
+# The example project keeps its scaffolded Kedro-template formatting.
+extend-exclude = ["examples"]
+
 [dependency-groups]
 dev = [
     "airlines",
