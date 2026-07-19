@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      # Required for PyPI trusted publishing.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v8.3.2
+      # --no-sources verifies the package builds without tool.uv.sources
+      # (the uv workspace for examples/), as consumers' build tools will.
+      # https://docs.astral.sh/uv/guides/package/#building-your-package
+      - run: uv build --no-sources
+      - run: uv publish
