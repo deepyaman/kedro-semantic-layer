@@ -1,6 +1,7 @@
 import ibis
 import pytest
 from boring_semantic_layer import SemanticTable
+from kedro.io import CachedDataset
 
 from helpers import InMemoryTableDataset, make_catalog
 
@@ -236,6 +237,47 @@ def test_transitive_join_chain():
     )
     assert list(result["flights.origin"]) == ["JFK", "ORD"]
     assert list(result["booking_count"]) == [2, 1]
+
+
+def test_cached_dataset_avoids_redundant_join_loads():
+    """Wrapping a frequently-joined dataset in `kedro.io.CachedDataset` loads
+    it once per session, even when multiple other datasets join to it.
+    `metadata` must live on the `CachedDataset` entry itself -- the hook
+    checks the top-level catalog entry, not the `dataset:` it wraps.
+    """
+    load_count = {"carriers": 0}
+
+    class CountingCarriers(InMemoryTableDataset):
+        def load(self) -> ibis.Table:
+            load_count["carriers"] += 1
+            return super().load()
+
+    join_config = {
+        "carriers": {
+            "model": "carriers",
+            "type": "one",
+            "left_on": "carrier",
+            "right_on": "code",
+        }
+    }
+    flights_config = {**FLIGHTS_CONFIG, "joins": join_config}
+    catalog = make_catalog(
+        flights=InMemoryTableDataset(
+            FLIGHTS, metadata={"kedro-semantic-layer": flights_config}
+        ),
+        bookings=InMemoryTableDataset(
+            FLIGHTS, metadata={"kedro-semantic-layer": flights_config}
+        ),
+        carriers=CachedDataset(
+            dataset=CountingCarriers(CARRIERS), metadata=CARRIERS_METADATA
+        ),
+    )
+
+    catalog.load("flights")
+    catalog.load("bookings")
+    catalog.load("flights")
+
+    assert load_count["carriers"] == 1
 
 
 def test_join_cycle_raises_at_catalog_creation():
